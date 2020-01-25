@@ -61,12 +61,12 @@ public class MyModule implements Module {
 
 	public void configure(Binder binder) {
 
-        // add annotated Mappers ...
-        MybatisModule.extend(binder)
-            // ... a whole package of Mappers
-        	.addMapperPackage(MyMapper1.class.getPackage())
-            // ... a single mapper
-            .addMapper(MyMapper2.class))
+		// add annotated Mappers ...
+		MybatisModule.extend(binder)
+			// ... a whole package of Mappers
+			.addMapperPackage(MyMapper1.class.getPackage())
+			// ... a single mapper
+			.addMapper(MyMapper2.class))
     }
 }
 ```
