@@ -50,9 +50,8 @@ Add the dependency on `bootique-mybatis` to your build. Here is a Maven example:
     <artifactId>bootique-mybatis</artifactId>
 </dependency>
 ```
-
-You can configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML configuration. Here
-are the examples of both..
+After that you can either configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML
+configuration. Below are a the examples of both.
 
 ## Bootstrapping with Bootique
 
