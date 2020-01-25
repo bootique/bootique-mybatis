@@ -21,22 +21,33 @@ package io.bootique.mybatis;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.jdbc.DataSourceFactory;
+import io.bootique.resource.ResourceFactory;
+import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
 @BQConfig
 public class SqlSessionManagerFactory {
 
+    private final Logger logger = LoggerFactory.getLogger(SqlSessionManagerFactory.class);
+
     private String environmentId;
     private String datasource;
+    private ResourceFactory config;
 
     public SqlSessionManager createSessionManager(
             DataSourceFactory dataSourceFactory,
@@ -44,27 +55,83 @@ public class SqlSessionManagerFactory {
             Set<Class<?>> mappers,
             Set<Package> mapperPackages) {
 
-        String datasourceName = dataSourceName(dataSourceFactory);
-        DataSource ds = dataSourceFactory.forName(datasourceName);
-
-        Environment env = new Environment(getEnvironmentId(), transactionFactory, ds);
-        Configuration configuration = createConfiguration(env, mappers, mapperPackages);
+        Configuration configuration = config != null
+                ? createConfigurationFromXML(dataSourceFactory, transactionFactory, mappers, mapperPackages)
+                : createConfigurationFromScratch(dataSourceFactory, transactionFactory, mappers, mapperPackages);
 
         SqlSessionFactory sessionFactoryDelegate = new SqlSessionFactoryBuilder().build(configuration);
         return SqlSessionManager.newInstance(sessionFactoryDelegate);
     }
 
-    protected Configuration createConfiguration(
-            Environment env,
+    protected Configuration createConfigurationFromXML(
+            DataSourceFactory dataSourceFactory,
+            TransactionFactory transactionFactory,
             Set<Class<?>> mappers,
             Set<Package> mapperPackages) {
 
-        Configuration configuration = new Configuration(env);
 
-        mappers.forEach(configuration::addMapper);
-        mapperPackages.forEach(mp -> configuration.addMappers(mp.getName()));
+        String environmentId = getEnvironmentId();
+        Configuration configuration = loadConfigurationFromXML(config, environmentId);
+
+        // if no environment was present or matched during XML parsing, provide the one configured in Bootique
+        if (configuration.getEnvironment() == null) {
+
+            logger.debug("MyBatis XML configuration does not specify environment for '{}'. Bootstrapping environment from Bootique...", environmentId);
+            Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
+            configuration.setEnvironment(environment);
+        }
+
+        mergeDIMappers(configuration, mappers, mapperPackages);
 
         return configuration;
+    }
+
+    protected Configuration createConfigurationFromScratch(
+            DataSourceFactory dataSourceFactory,
+            TransactionFactory transactionFactory,
+            Set<Class<?>> mappers,
+            Set<Package> mapperPackages) {
+
+        Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
+        Configuration configuration = new Configuration(environment);
+        mergeDIMappers(configuration, mappers, mapperPackages);
+
+        return configuration;
+    }
+
+    protected Environment createEnvironment(
+            DataSourceFactory dataSourceFactory,
+            TransactionFactory transactionFactory) {
+
+        String datasourceName = dataSourceName(dataSourceFactory);
+        logger.debug("Using Bootique DataSource named '{}' for MyBatis", datasourceName);
+
+        DataSource ds = dataSourceFactory.forName(datasourceName);
+        return new Environment(getEnvironmentId(), transactionFactory, ds);
+    }
+
+    protected Configuration loadConfigurationFromXML(ResourceFactory configResource, String environmentId) {
+
+        URL configUrl = config.getUrl();
+        logger.debug("Loading MyBatis configuration from XML at '{}' and environment '{}'", configUrl, environmentId);
+
+        try (Reader reader = new InputStreamReader(configResource.getUrl().openStream(), "UTF-8")) {
+
+            // "environmentId" filters an environment out of multiple choices.
+            // TODO:  pass properties from YAML as 3rd arg
+            XMLConfigBuilder parser = new XMLConfigBuilder(reader, environmentId);
+            return parser.parse();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading MyBatis config from " + configUrl, e);
+        }
+    }
+
+    protected void mergeDIMappers(
+            Configuration configuration,
+            Set<Class<?>> mappers,
+            Set<Package> mapperPackages) {
+        mappers.forEach(configuration::addMapper);
+        mapperPackages.forEach(mp -> configuration.addMappers(mp.getName()));
     }
 
     protected String dataSourceName(DataSourceFactory dataSourceFactory) {
@@ -101,5 +168,10 @@ public class SqlSessionManagerFactory {
         this.datasource = datasource;
     }
 
-
+    @BQConfigProperty("An optional resource URL of an XML config file. Most of the things in MyBatis can be configured " +
+            "via Bootique, but if you prefer XML configuration, this is the way to specify it. " +
+            " If the XML contains <environment> tag, XML-provided DataSource will be used instead of the one from Bootique.")
+    public void setConfig(ResourceFactory config) {
+        this.config = config;
+    }
 }

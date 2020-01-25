@@ -16,26 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.mybatis.testpojos1;
+package io.bootique.mybatis.testmappersxml1;
 
-public class TO2 {
+import io.bootique.mybatis.testpojos.TO3;
 
-    private int c1;
-    private String c2;
+import java.util.Optional;
 
-    public int getC1() {
-        return c1;
-    }
+public interface T3Mapper {
 
-    public void setC1(int c1) {
-        this.c1 = c1;
-    }
-
-    public String getC2() {
-        return c2;
-    }
-
-    public void setC2(String c2) {
-        this.c2 = c2;
-    }
+    Optional<TO3> find(Long c1);
 }

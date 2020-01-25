@@ -24,8 +24,8 @@ import io.bootique.jdbc.test.Table;
 import io.bootique.jdbc.test.TestDataManager;
 import io.bootique.mybatis.testmappers1.T1Mapper;
 import io.bootique.mybatis.testmappers2.T2Mapper;
-import io.bootique.mybatis.testpojos1.TO1;
-import io.bootique.mybatis.testpojos1.TO2;
+import io.bootique.mybatis.testpojos.TO1;
+import io.bootique.mybatis.testpojos.TO2;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
@@ -38,7 +38,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 
-public class MybatisModuleIT {
+public class MybatisModuleNoXMLIT {
 
     @ClassRule
     public static BQTestFactory TEST_FACTORY = new BQTestFactory();
@@ -48,12 +48,12 @@ public class MybatisModuleIT {
     private static BQRuntime RUNTIME;
 
     @Rule
-    public TestDataManager dataManager = new TestDataManager(true, T1);
+    public TestDataManager dataManager = new TestDataManager(true, T1, T2);
 
     @BeforeClass
     public static void setupDB() {
         RUNTIME = TEST_FACTORY
-                .app("--config=classpath:io/bootique/mybatis/MybatisModuleIT.yml")
+                .app("--config=classpath:io/bootique/mybatis/MybatisModuleNoXMLIT.yml")
                 .autoLoadModules()
                 .module(b -> MybatisModule.extend(b)
                         .addMapperPackage(T1Mapper.class.getPackage())
@@ -79,10 +79,10 @@ public class MybatisModuleIT {
         try (SqlSession session = sessionManager.openSession()) {
 
             T1Mapper t1Mapper = session.getMapper(T1Mapper.class);
-            Optional<TO1> miss = t1Mapper.getById(3L);
+            Optional<TO1> miss = t1Mapper.find(3L);
             assertFalse(miss.isPresent());
 
-            Optional<TO1> hit = t1Mapper.getById(5L);
+            Optional<TO1> hit = t1Mapper.find(5L);
             assertTrue(hit.isPresent());
             assertEquals(5, hit.get().getC1());
             assertEquals("a", hit.get().getC2());
@@ -102,10 +102,10 @@ public class MybatisModuleIT {
         try (SqlSession session = sessionManager.openSession()) {
 
             T2Mapper t2Mapper = session.getMapper(T2Mapper.class);
-            Optional<TO2> miss = t2Mapper.getById(3L);
+            Optional<TO2> miss = t2Mapper.find(3L);
             assertFalse(miss.isPresent());
 
-            Optional<TO2> hit = t2Mapper.getById(6L);
+            Optional<TO2> hit = t2Mapper.find(6L);
             assertTrue(hit.isPresent());
             assertEquals(6, hit.get().getC1());
             assertEquals("x", hit.get().getC2());

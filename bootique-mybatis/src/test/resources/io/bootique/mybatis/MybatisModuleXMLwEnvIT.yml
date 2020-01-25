@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-jdbc:
-  MybatisModuleIT:
-    url: jdbc:derby:target/derby/MybatisModuleIT;create=true
-    driverClassName: org.apache.derby.jdbc.EmbeddedDriver
-    initialSize: 1
+mybatis:
+  environmentId: e1
+  config: "classpath:io/bootique/mybatis/mybatis-config-env.xml"

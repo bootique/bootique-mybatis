@@ -18,7 +18,7 @@
  */
 package io.bootique.mybatis.testmappers2;
 
-import io.bootique.mybatis.testpojos1.TO2;
+import io.bootique.mybatis.testpojos.TO2;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -32,5 +32,5 @@ public interface T2Mapper {
             @Result(property = "c1", column = "c1"),
             @Result(property = "c2", column = "c2")
     })
-    Optional<TO2> getById(Long c1);
+    Optional<TO2> find(Long c1);
 }

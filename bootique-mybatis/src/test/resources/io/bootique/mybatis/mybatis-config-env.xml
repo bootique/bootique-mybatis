@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <environments default="e1">
+        <environment id="e1">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+                <property name="url" value="jdbc:derby:target/derby/MybatisModuleXMLwEnvIT;create=true"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="io/bootique/mybatis/t4-mapper.xml"/>
+    </mappers>
+</configuration>

@@ -16,25 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.mybatis.testmappers1;
+package io.bootique.mybatis.testpojos;
 
-import io.bootique.mybatis.testpojos.TO1;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+public class TO3 {
 
-import java.util.Optional;
+    private int c1;
+    private String c2;
 
-@Mapper
-public interface T1Mapper {
+    public int getC1() {
+        return c1;
+    }
 
-    @Select("SELECT \"c1\", \"c2\", \"c3\" FROM \"t1\" WHERE \"c1\" = #{c1}")
-    @Results(value = {
-            @Result(property = "c1", column = "c1"),
-            @Result(property = "c2", column = "c2"),
-            @Result(property = "c3", column = "c3"),
-            @Result(property = "c3_x", column = "c3")
-    })
-    Optional<TO1> find(Long c1);
+    public void setC1(int c1) {
+        this.c1 = c1;
+    }
+
+    public String getC2() {
+        return c2;
+    }
+
+    public void setC2(String c2) {
+        this.c2 = c2;
+    }
 }
