@@ -96,8 +96,8 @@ mybatis:
 
 ## Everything is Configured in MyBatis XML
 
-If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (and combine
-such approach with Bootique-configured DataSource if needed).
+If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (optionally
+combining it with Bootique-configured DataSource).
 
 First, configure a reference to MyBatis YAML file:
 ```yaml
