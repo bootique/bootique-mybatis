@@ -32,6 +32,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Provider;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,13 +52,13 @@ public class SqlSessionManagerFactory {
 
     public SqlSessionManager createSessionManager(
             DataSourceFactory dataSourceFactory,
-            TransactionFactory transactionFactory,
+            Provider<TransactionFactory> transactionFactory,
             Set<Class<?>> mappers,
             Set<Package> mapperPackages) {
 
         Configuration configuration = config != null
                 ? createConfigurationFromXML(dataSourceFactory, transactionFactory, mappers, mapperPackages)
-                : createConfigurationFromScratch(dataSourceFactory, transactionFactory, mappers, mapperPackages);
+                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get(), mappers, mapperPackages);
 
         SqlSessionFactory sessionFactoryDelegate = new SqlSessionFactoryBuilder().build(configuration);
         return SqlSessionManager.newInstance(sessionFactoryDelegate);
@@ -65,7 +66,7 @@ public class SqlSessionManagerFactory {
 
     protected Configuration createConfigurationFromXML(
             DataSourceFactory dataSourceFactory,
-            TransactionFactory transactionFactory,
+            Provider<TransactionFactory> transactionFactory,
             Set<Class<?>> mappers,
             Set<Package> mapperPackages) {
 
@@ -77,7 +78,9 @@ public class SqlSessionManagerFactory {
         if (configuration.getEnvironment() == null) {
 
             logger.debug("MyBatis XML configuration does not specify environment for '{}'. Bootstrapping environment from Bootique...", environmentId);
-            Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
+
+            // deferring TransactionFactory creation until we know for sure that we need it...
+            Environment environment = createEnvironment(dataSourceFactory, transactionFactory.get());
             configuration.setEnvironment(environment);
         }
 

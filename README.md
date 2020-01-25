@@ -29,7 +29,8 @@ Provides [MyBatis](https://mybatis.org/mybatis-3/) integration with [Bootique](h
 
 # Setup
 
-## Add bootique-mybatis to your build tool
+## Add `bootique-mybatis` to your build
+
 **Maven**
 ```xml
 <dependencyManagement>
@@ -51,4 +52,103 @@ Provides [MyBatis](https://mybatis.org/mybatis-3/) integration with [Bootique](h
 ```
 
 You can configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML configuration. Here
-are the examples of both:
+are the examples of both..
+
+## Bootstrapping with Bootique
+
+Configure MyBatis mappers:
+```java
+public class MyModule implements Module {
+
+	public void configure(Binder binder) {
+
+		// add annotated mappers
+        MybatisModule.extend(binder)
+        	// as a package
+        	.addMapperPackage(MyMapper1.class.getPackage())
+        	// as an individual mapper
+            .addMapper(MyMapper2.class))
+    }
+}
+```
+
+Configure DataSource:
+
+```yaml
+# Implicit single DataSource ..
+jdbc:
+  myds:
+    jdbcUrl: "jdbc:mysql://127.0.0.1:3306/mydb"
+    username: root
+    password: secret
+```
+
+```yaml
+# Explicit DataSource name
+jdbc:
+  myds:
+    jdbcUrl: "jdbc:mysql://127.0.0.1/mydb"
+    username: root
+    password: secret
+
+mybatis:
+  datasource: myds
+```
+
+## Bootstrapping with MyBatis Config XML file:
+
+Configure a reference to MyBatis YAML file:
+```yaml
+mybatis:
+  environmentId: qa
+  config: classpath:mybatis-config.xml
+```
+
+Create MyBatis XML file as you normally would. In this example it must contain the `<environment>..</environment>`
+section that contains DB connection info. If you omit the "environment" config, make sure you configure a Bootique
+DataSource in YAML as described above.
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <environments default="default">
+
+        <!-- If "environment" is not provided, Bootique will look for DataSource configuration in YAML -->
+        <environment id="qa">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://127.0.0.1/mydb"/>
+                <property name="username" value="root"/>
+                <property name="password" value="secret"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="com/foo/MyMapper1.xml"/>
+        <mapper resource="com/foo/MyMapper2.xml"/>
+    </mappers>
+</configuration>
+```
+
+## Use MyBatis
+
+Regardless of how MyBatis was configured, you can use it in the same way, by injecting `SqlSessionManager`:
+
+```java
+public class MyClass {
+
+   @Inject
+   private SqlSessionManager sessionManager;
+
+   public void doSomething() {
+      try (SqlSession session = sessionManager.openSession()) {
+		MyMapper2 mapper = session.getMapper(MyMapper2.class);
+		Optional<O1> o1 = mapper.find(1);
+      }
+   }
+}
+```

@@ -28,6 +28,7 @@ import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Set;
 
@@ -68,7 +69,7 @@ public class MybatisModule extends ConfigModule {
     public SqlSessionManager provideSessionManager(
             ConfigurationFactory configFactory,
             DataSourceFactory dsFactory,
-            TransactionFactory transactionFactory,
+            Provider<TransactionFactory> transactionFactory,
             @ByMybatisModule Set<Class<?>> mappers,
             @ByMybatisModule Set<Package> mapperPackages) {
 
