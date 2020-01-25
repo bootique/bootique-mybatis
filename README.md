@@ -62,20 +62,20 @@ public class MyModule implements Module {
 
 	public void configure(Binder binder) {
 
-		// add annotated mappers
+        // add annotated Mappers ...
         MybatisModule.extend(binder)
-        	// as a package
+            // ... a whole package of Mappers
         	.addMapperPackage(MyMapper1.class.getPackage())
-        	// as an individual mapper
+            // ... a single mapper
             .addMapper(MyMapper2.class))
     }
 }
 ```
 
-Configure DataSource:
+Configure DataSource in Bootique:
 
 ```yaml
-# Implicit single DataSource ..
+# Implicit single DataSource. MyBatis will find and use it automatically.
 jdbc:
   myds:
     jdbcUrl: "jdbc:mysql://127.0.0.1:3306/mydb"
@@ -84,28 +84,31 @@ jdbc:
 ```
 
 ```yaml
-# Explicit DataSource name
 jdbc:
   myds:
     jdbcUrl: "jdbc:mysql://127.0.0.1/mydb"
     username: root
     password: secret
 
+# Explicitly reference a named DataSource
 mybatis:
   datasource: myds
 ```
 
 ## Bootstrapping with MyBatis Config XML file:
 
-Configure a reference to MyBatis YAML file:
+If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (and combine
+such approach with Bootique-configured DataSource if needed).
+
+First, configure a reference to MyBatis YAML file:
 ```yaml
 mybatis:
   environmentId: qa
   config: classpath:mybatis-config.xml
 ```
 
-Create MyBatis XML file as you normally would. In this example it must contain the `<environment>..</environment>`
-section that contains DB connection info. If you omit the "environment" config, make sure you configure a Bootique
+Second create MyBatis config XML as you normally would. In this example it contains the `<environment>..</environment>`
+section with DB connection info. If you omit the "environment" config, make sure you configure a Bootique
 DataSource in YAML as described above.
 
 ```xml
