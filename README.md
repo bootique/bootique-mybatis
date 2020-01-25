@@ -142,14 +142,14 @@ Regardless of how MyBatis was configured, you can use it in the same way, by inj
 ```java
 public class MyClass {
 
-   @Inject
-   private SqlSessionManager sessionManager;
+	@Inject
+	private SqlSessionManager sessionManager;
 
-   public void doSomething() {
-      try (SqlSession session = sessionManager.openSession()) {
-		MyMapper2 mapper = session.getMapper(MyMapper2.class);
-		Optional<O1> o1 = mapper.find(1);
-      }
-   }
+	public void doSomething() {
+		try (SqlSession session = sessionManager.openSession()) {
+			MyMapper2 mapper = session.getMapper(MyMapper2.class);
+			Optional<O1> o1 = mapper.find(1);
+		}
+	}
 }
 ```
