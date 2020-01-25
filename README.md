@@ -31,7 +31,7 @@ Provides [MyBatis](https://mybatis.org/mybatis-3/) integration with [Bootique](h
 
 ## Add `bootique-mybatis` to your build
 
-**Maven**
+Add the dependency on `bootique-mybatis` to your build. Here is a Maven example:
 ```xml
 <dependencyManagement>
     <dependencies>
