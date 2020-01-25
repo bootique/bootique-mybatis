@@ -53,7 +53,7 @@ Add the dependency on `bootique-mybatis` to your build. Here is a Maven example:
 After that you can either configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML
 configuration. Below are a the examples of both.
 
-## Bootstrapping with Bootique
+## Mappers Configured in the Code / DataSource Provided by Bootique
 
 Configure MyBatis mappers:
 ```java
@@ -94,7 +94,7 @@ mybatis:
   datasource: myds
 ```
 
-## Bootstrapping with MyBatis Config XML file:
+## Everything is Configured in MyBatis XML
 
 If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (and combine
 such approach with Bootique-configured DataSource if needed).
