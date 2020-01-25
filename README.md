@@ -99,13 +99,12 @@ mybatis:
 If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (optionally
 combining it with Bootique-configured DataSource).
 
-First, configure a reference to MyBatis YAML file:
+First, configure a reference to MyBatis XML:
 ```yaml
 mybatis:
   environmentId: qa
   config: classpath:mybatis-config.xml
 ```
-
 Second create MyBatis config XML as you normally would. In this example it contains the `<environment>..</environment>`
 section with DB connection info. If you omit the "environment" config, make sure you configure a Bootique
 DataSource in YAML as described above.
