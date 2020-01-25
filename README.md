@@ -43,8 +43,12 @@ Provides [MyBatis](https://mybatis.org/mybatis-3/) integration with [Bootique](h
         </dependency>
     </dependencies>
 </dependencyManagement>
-
+...
 <dependency>
     <groupId>io.bootique.mybatis</groupId>
     <artifactId>bootique-mybatis</artifactId>
 </dependency>
+```
+
+You can configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML configuration. Here
+are the examples of both:
