@@ -19,7 +19,61 @@
 package io.bootique.mybatis;
 
 import io.bootique.ConfigModule;
+import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.Binder;
+import io.bootique.di.Provides;
+import io.bootique.jdbc.DataSourceFactory;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionManager;
+import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+
+import javax.inject.Singleton;
+import java.util.Set;
 
 public class MybatisModule extends ConfigModule {
 
+    /**
+     * Returns an instance of {@link MyBatisModuleExtender} used by downstream modules to load custom extensions of
+     * services declared in the MybatisModule (mappers, etc). Should be invoked from a downstream Module's "configure"
+     * method.
+     *
+     * @param binder DI binder passed to the Module that invokes this method.
+     * @return an instance of {@link MyBatisModuleExtender} that can be used to load MyBatis custom extensions.
+     */
+    public static MyBatisModuleExtender extend(Binder binder) {
+        return new MyBatisModuleExtender(binder);
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        MybatisModule.extend(binder).initAllExtensions();
+    }
+
+    @Provides
+    @Singleton
+    public SqlSessionFactory provideSessionFactory(SqlSessionManager sessionManager) {
+        return sessionManager;
+    }
+
+    @Provides
+    @Singleton
+    TransactionFactory provideTransactionFactory() {
+        return new JdbcTransactionFactory();
+    }
+
+    // SqlSessionManager is a newer more feature-rich version of SqlSessionFactory (which actually wraps a factory)
+    @Provides
+    @Singleton
+    public SqlSessionManager provideSessionManager(
+            ConfigurationFactory configFactory,
+            DataSourceFactory dsFactory,
+            TransactionFactory transactionFactory,
+            @ByMybatisModule Set<Class<?>> mappers,
+            @ByMybatisModule Set<Package> mapperPackages) {
+
+        return configFactory
+                .config(SqlSessionManagerFactory.class, configPrefix)
+                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages);
+    }
 }

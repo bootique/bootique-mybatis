@@ -35,6 +35,14 @@
             <groupId>io.bootique</groupId>
             <artifactId>bootique</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.bootique.jdbc</groupId>
+            <artifactId>bootique-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
 
         <!-- Unit test dependencies -->
         <dependency>
@@ -48,11 +56,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
@@ -60,6 +63,11 @@
         <dependency>
             <groupId>io.bootique</groupId>
             <artifactId>bootique-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.bootique.jdbc</groupId>
+            <artifactId>bootique-jdbc-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

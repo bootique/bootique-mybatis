@@ -1,3 +1,3 @@
 ## 2.0
 
-* Initial implementation
+* #1 Injectable SqlSessionFactory instance
