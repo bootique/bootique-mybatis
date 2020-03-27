@@ -23,11 +23,13 @@ import io.bootique.di.Binder;
 import io.bootique.di.Key;
 import io.bootique.di.SetBuilder;
 import io.bootique.di.TypeLiteral;
+import org.apache.ibatis.type.TypeHandler;
 
 public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender> {
 
     private SetBuilder<Class<?>> mappers;
     private SetBuilder<Package> mapperPackages;
+    private SetBuilder<TypeHandler> handlers;
 
     public MyBatisModuleExtender(Binder binder) {
         super(binder);
@@ -36,7 +38,7 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     @Override
     public MyBatisModuleExtender initAllExtensions() {
         contributeMappers();
-        contributePackages();
+        contributeMapperPackages();
         return this;
     }
 
@@ -46,12 +48,22 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     }
 
     public MyBatisModuleExtender addMapperPackage(Package aPackage) {
-        contributePackages().add(aPackage);
+        contributeMapperPackages().add(aPackage);
         return this;
     }
 
     public MyBatisModuleExtender addMapperPackage(Class<?> anyClassInPackage) {
-        contributePackages().add(anyClassInPackage.getPackage());
+        contributeMapperPackages().add(anyClassInPackage.getPackage());
+        return this;
+    }
+
+    public <T extends TypeHandler> MyBatisModuleExtender addTypeHandler(Class<T> handlerType) {
+        contributeTypeHandlers().add(handlerType);
+        return this;
+    }
+
+    public <T extends TypeHandler> MyBatisModuleExtender addTypeHandler(T handler) {
+        contributeTypeHandlers().add(handler);
         return this;
     }
 
@@ -64,10 +76,17 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
         return mappers;
     }
 
-    protected SetBuilder<Package> contributePackages() {
+    protected SetBuilder<Package> contributeMapperPackages() {
         if (mapperPackages == null) {
             mapperPackages = newSet(Package.class, ByMybatisModule.class);
         }
         return mapperPackages;
+    }
+
+    protected SetBuilder<TypeHandler> contributeTypeHandlers() {
+        if (handlers == null) {
+            handlers = newSet(TypeHandler.class);
+        }
+        return handlers;
     }
 }

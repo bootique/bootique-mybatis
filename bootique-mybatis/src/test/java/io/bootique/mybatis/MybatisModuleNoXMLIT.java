@@ -22,9 +22,12 @@ import io.bootique.BQRuntime;
 import io.bootique.jdbc.test.DatabaseChannel;
 import io.bootique.jdbc.test.Table;
 import io.bootique.mybatis.testmappers1.T1Mapper;
+import io.bootique.mybatis.testmappers1.T5Mapper;
 import io.bootique.mybatis.testmappers2.T2Mapper;
 import io.bootique.mybatis.testpojos.TO1;
 import io.bootique.mybatis.testpojos.TO2;
+import io.bootique.mybatis.testpojos.TO5;
+import io.bootique.mybatis.testtypehanlders.V1Handler;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
@@ -52,7 +55,8 @@ public class MybatisModuleNoXMLIT {
                 .autoLoadModules()
                 .module(b -> MybatisModule.extend(b)
                         .addMapperPackage(T1Mapper.class.getPackage())
-                        .addMapper(T2Mapper.class))
+                        .addMapper(T2Mapper.class)
+                        .addTypeHandler(V1Handler.class))
                 .createRuntime();
 
         channel = DatabaseChannel.get(runtime);
@@ -67,6 +71,11 @@ public class MybatisModuleNoXMLIT {
     private Table createT2() {
         channel.execStatement().exec("CREATE TABLE \"t2\" (\"c1\" INT, \"c2\" VARCHAR(10))");
         return channel.newTable("t2").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
+    }
+
+    private Table createT5() {
+        channel.execStatement().exec("CREATE TABLE \"t5\" (\"c1\" INT, \"c2\" INT)");
+        return channel.newTable("t5").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
     }
 
     @Test
@@ -108,6 +117,24 @@ public class MybatisModuleNoXMLIT {
             assertTrue(hit.isPresent());
             assertEquals(6, hit.get().getC1());
             assertEquals("x", hit.get().getC2());
+        }
+    }
+
+    @Test
+    public void testSqlSessionManager_TypeHandlers() {
+
+        createT5().insertColumns("c1", "c2")
+                .values(6, 15)
+                .exec();
+
+        try (SqlSession session = sessionManager.openSession()) {
+
+            T5Mapper mapper = session.getMapper(T5Mapper.class);
+
+            Optional<TO5> hit = mapper.find(6L);
+            assertTrue(hit.isPresent());
+            assertEquals(6, hit.get().getC1());
+            assertEquals(15, hit.get().getC2().getV());
         }
     }
 }

@@ -29,6 +29,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +56,12 @@ public class SqlSessionManagerFactory {
             DataSourceFactory dataSourceFactory,
             Provider<TransactionFactory> transactionFactory,
             Set<Class<?>> mappers,
-            Set<Package> mapperPackages) {
+            Set<Package> mapperPackages,
+            Set<TypeHandler> typeHandlers) {
 
         Configuration configuration = config != null
-                ? createConfigurationFromXML(dataSourceFactory, transactionFactory, mappers, mapperPackages)
-                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get(), mappers, mapperPackages);
+                ? createConfigurationFromXML(dataSourceFactory, transactionFactory, mappers, mapperPackages, typeHandlers)
+                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get(), mappers, mapperPackages, typeHandlers);
 
         SqlSessionFactory sessionFactoryDelegate = new SqlSessionFactoryBuilder().build(configuration);
         return SqlSessionManager.newInstance(sessionFactoryDelegate);
@@ -68,8 +71,8 @@ public class SqlSessionManagerFactory {
             DataSourceFactory dataSourceFactory,
             Provider<TransactionFactory> transactionFactory,
             Set<Class<?>> mappers,
-            Set<Package> mapperPackages) {
-
+            Set<Package> mapperPackages,
+            Set<TypeHandler> typeHandlers) {
 
         String environmentId = getEnvironmentId();
         Configuration configuration = loadConfigurationFromXML(config, environmentId);
@@ -84,6 +87,8 @@ public class SqlSessionManagerFactory {
             configuration.setEnvironment(environment);
         }
 
+        // must install handlers before loading mappers... mappers need handlers
+        installDIHandlers(configuration, typeHandlers);
         mergeDIMappers(configuration, mappers, mapperPackages);
 
         return configuration;
@@ -93,10 +98,14 @@ public class SqlSessionManagerFactory {
             DataSourceFactory dataSourceFactory,
             TransactionFactory transactionFactory,
             Set<Class<?>> mappers,
-            Set<Package> mapperPackages) {
+            Set<Package> mapperPackages,
+            Set<TypeHandler> typeHandlers) {
 
         Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
         Configuration configuration = new Configuration(environment);
+
+        // must install handlers before loading mappers... mappers need handlers
+        installDIHandlers(configuration, typeHandlers);
         mergeDIMappers(configuration, mappers, mapperPackages);
 
         return configuration;
@@ -135,6 +144,13 @@ public class SqlSessionManagerFactory {
             Set<Package> mapperPackages) {
         mappers.forEach(configuration::addMapper);
         mapperPackages.forEach(mp -> configuration.addMappers(mp.getName()));
+    }
+
+    protected void installDIHandlers(
+            Configuration configuration,
+            Set<TypeHandler> typeHandlers) {
+        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+        typeHandlers.forEach(registry::register);
     }
 
     protected String dataSourceName(DataSourceFactory dataSourceFactory) {

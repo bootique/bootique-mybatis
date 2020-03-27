@@ -27,6 +27,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.apache.ibatis.type.TypeHandler;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -71,10 +72,11 @@ public class MybatisModule extends ConfigModule {
             DataSourceFactory dsFactory,
             Provider<TransactionFactory> transactionFactory,
             @ByMybatisModule Set<Class<?>> mappers,
-            @ByMybatisModule Set<Package> mapperPackages) {
+            @ByMybatisModule Set<Package> mapperPackages,
+            Set<TypeHandler> typeHandlers) {
 
         return configFactory
                 .config(SqlSessionManagerFactory.class, configPrefix)
-                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages);
+                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages, typeHandlers);
     }
 }
