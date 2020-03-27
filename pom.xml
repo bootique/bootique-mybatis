@@ -44,7 +44,7 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <mybatis.version>3.5.3</mybatis.version>
+        <mybatis.version>3.5.4</mybatis.version>
     </properties>
 
     <scm>
