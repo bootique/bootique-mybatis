@@ -29,10 +29,12 @@ import java.util.Optional;
 @Mapper
 public interface T5Mapper {
 
-    @Select("SELECT \"c1\", \"c2\" FROM \"t5\" WHERE \"c1\" = #{c1}")
+    @Select("SELECT \"c1\", \"c2\", \"c3\", \"c4\" FROM \"t5\" WHERE \"c1\" = #{c1}")
     @Results(value = {
             @Result(property = "c1", column = "c1"),
-            @Result(property = "c2", column = "c2")
+            @Result(property = "c2", column = "c2"),
+            @Result(property = "c3", column = "c3"),
+            @Result(property = "c4", column = "c4")
     })
     Optional<TO5> find(Long c1);
 }

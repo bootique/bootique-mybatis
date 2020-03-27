@@ -18,42 +18,15 @@
  */
 package io.bootique.mybatis.testpojos;
 
-public class TO5 {
+public class V3 {
 
-    private int c1;
-    private V1 c2;
-    private V3 c3;
-    private V4 c4;
+    private int v;
 
-    public int getC1() {
-        return c1;
+    public V3(int v) {
+        this.v = v;
     }
 
-    public void setC1(int c1) {
-        this.c1 = c1;
-    }
-
-    public V1 getC2() {
-        return c2;
-    }
-
-    public void setC2(V1 c2) {
-        this.c2 = c2;
-    }
-
-    public V3 getC3() {
-        return c3;
-    }
-
-    public void setC3(V3 c3) {
-        this.c3 = c3;
-    }
-
-    public V4 getC4() {
-        return c4;
-    }
-
-    public void setC4(V4 c4) {
-        this.c4 = c4;
+    public int getV() {
+        return v;
     }
 }

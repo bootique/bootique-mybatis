@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.mybatis.testtypehandlers;
+package io.bootique.mybatis.testtypehandlers2;
 
-import io.bootique.mybatis.testpojos.V1;
+import io.bootique.mybatis.testpojos.V3;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
@@ -27,28 +27,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class V1Handler extends BaseTypeHandler<V1> {
+public class V3Handler extends BaseTypeHandler<V3> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, V1 parameter, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int i, V3 parameter, JdbcType jdbcType) throws SQLException {
         ps.setInt(i, parameter.getV());
     }
 
     @Override
-    public V1 getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public V3 getNullableResult(ResultSet rs, String columnName) throws SQLException {
         int result = rs.getInt(columnName);
-        return result == 0 && rs.wasNull() ? null : new V1(result);
+        return result == 0 && rs.wasNull() ? null : new V3(result);
     }
 
     @Override
-    public V1 getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+    public V3 getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         int result = rs.getInt(columnIndex);
-        return result == 0 && rs.wasNull() ? null : new V1(result);
+        return result == 0 && rs.wasNull() ? null : new V3(result);
     }
 
     @Override
-    public V1 getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public V3 getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         int result = cs.getInt(columnIndex);
-        return result == 0 && cs.wasNull() ? null : new V1(result);
+        return result == 0 && cs.wasNull() ? null : new V3(result);
     }
 }

@@ -57,11 +57,16 @@ public class SqlSessionManagerFactory {
             Provider<TransactionFactory> transactionFactory,
             Set<Class<?>> mappers,
             Set<Package> mapperPackages,
-            Set<TypeHandler> typeHandlers) {
+            Set<TypeHandler> typeHandlers,
+            Set<Package> typeHandlerPackages) {
 
         Configuration configuration = config != null
-                ? createConfigurationFromXML(dataSourceFactory, transactionFactory, mappers, mapperPackages, typeHandlers)
-                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get(), mappers, mapperPackages, typeHandlers);
+                ? createConfigurationFromXML(dataSourceFactory, transactionFactory)
+                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get());
+
+        // must install handlers before loading mappers... mappers need handlers
+        mergeDITypeHandlers(configuration, typeHandlers, typeHandlerPackages);
+        mergeDIMappers(configuration, mappers, mapperPackages);
 
         SqlSessionFactory sessionFactoryDelegate = new SqlSessionFactoryBuilder().build(configuration);
         return SqlSessionManager.newInstance(sessionFactoryDelegate);
@@ -69,10 +74,7 @@ public class SqlSessionManagerFactory {
 
     protected Configuration createConfigurationFromXML(
             DataSourceFactory dataSourceFactory,
-            Provider<TransactionFactory> transactionFactory,
-            Set<Class<?>> mappers,
-            Set<Package> mapperPackages,
-            Set<TypeHandler> typeHandlers) {
+            Provider<TransactionFactory> transactionFactory) {
 
         String environmentId = getEnvironmentId();
         Configuration configuration = loadConfigurationFromXML(config, environmentId);
@@ -87,28 +89,15 @@ public class SqlSessionManagerFactory {
             configuration.setEnvironment(environment);
         }
 
-        // must install handlers before loading mappers... mappers need handlers
-        installDIHandlers(configuration, typeHandlers);
-        mergeDIMappers(configuration, mappers, mapperPackages);
-
         return configuration;
     }
 
     protected Configuration createConfigurationFromScratch(
             DataSourceFactory dataSourceFactory,
-            TransactionFactory transactionFactory,
-            Set<Class<?>> mappers,
-            Set<Package> mapperPackages,
-            Set<TypeHandler> typeHandlers) {
+            TransactionFactory transactionFactory) {
 
         Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
-        Configuration configuration = new Configuration(environment);
-
-        // must install handlers before loading mappers... mappers need handlers
-        installDIHandlers(configuration, typeHandlers);
-        mergeDIMappers(configuration, mappers, mapperPackages);
-
-        return configuration;
+        return new Configuration(environment);
     }
 
     protected Environment createEnvironment(
@@ -138,19 +127,22 @@ public class SqlSessionManagerFactory {
         }
     }
 
+    protected void mergeDITypeHandlers(
+            Configuration configuration,
+            Set<TypeHandler> typeHandlers,
+            Set<Package> typeHandlerPackages) {
+
+        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+        typeHandlers.forEach(registry::register);
+        typeHandlerPackages.forEach(hp -> registry.register(hp.getName()));
+    }
+
     protected void mergeDIMappers(
             Configuration configuration,
             Set<Class<?>> mappers,
             Set<Package> mapperPackages) {
         mappers.forEach(configuration::addMapper);
         mapperPackages.forEach(mp -> configuration.addMappers(mp.getName()));
-    }
-
-    protected void installDIHandlers(
-            Configuration configuration,
-            Set<TypeHandler> typeHandlers) {
-        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
-        typeHandlers.forEach(registry::register);
     }
 
     protected String dataSourceName(DataSourceFactory dataSourceFactory) {

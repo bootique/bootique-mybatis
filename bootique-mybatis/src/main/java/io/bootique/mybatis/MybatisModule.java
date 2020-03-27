@@ -73,10 +73,11 @@ public class MybatisModule extends ConfigModule {
             Provider<TransactionFactory> transactionFactory,
             @ByMybatisModule Set<Class<?>> mappers,
             @ByMybatisModule Set<Package> mapperPackages,
-            Set<TypeHandler> typeHandlers) {
+            Set<TypeHandler> typeHandlers,
+            @TypeHandlerPackageByMybatisModule Set<Package> typeHandlerPackages) {
 
         return configFactory
                 .config(SqlSessionManagerFactory.class, configPrefix)
-                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages, typeHandlers);
+                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages, typeHandlers, typeHandlerPackages);
     }
 }

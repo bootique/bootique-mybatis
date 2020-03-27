@@ -30,6 +30,7 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     private SetBuilder<Class<?>> mappers;
     private SetBuilder<Package> mapperPackages;
     private SetBuilder<TypeHandler> handlers;
+    private SetBuilder<Package> handlerPackages;
 
     public MyBatisModuleExtender(Binder binder) {
         super(binder);
@@ -40,6 +41,8 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
         contributeMappers();
         contributeMapperPackages();
         contributeTypeHandlers();
+        contributeTypeHandlerPackages();
+
         return this;
     }
 
@@ -68,6 +71,16 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
         return this;
     }
 
+    public MyBatisModuleExtender addTypeHandlerPackage(Package aPackage) {
+        contributeTypeHandlerPackages().add(aPackage);
+        return this;
+    }
+
+    public MyBatisModuleExtender addTypeHandlerPackage(Class<?> anyClassInPackage) {
+        contributeTypeHandlerPackages().add(anyClassInPackage.getPackage());
+        return this;
+    }
+
     protected SetBuilder<Class<?>> contributeMappers() {
         if (mappers == null) {
             TypeLiteral<Class<?>> type = new TypeLiteral<Class<?>>() {
@@ -89,5 +102,12 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
             handlers = newSet(TypeHandler.class);
         }
         return handlers;
+    }
+
+    protected SetBuilder<Package> contributeTypeHandlerPackages() {
+        if (handlerPackages == null) {
+            handlerPackages = newSet(Package.class, TypeHandlerPackageByMybatisModule.class);
+        }
+        return handlerPackages;
     }
 }

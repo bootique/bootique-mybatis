@@ -27,7 +27,8 @@ import io.bootique.mybatis.testmappers2.T2Mapper;
 import io.bootique.mybatis.testpojos.TO1;
 import io.bootique.mybatis.testpojos.TO2;
 import io.bootique.mybatis.testpojos.TO5;
-import io.bootique.mybatis.testtypehandlers.V1Handler;
+import io.bootique.mybatis.testtypehandlers1.V1Handler;
+import io.bootique.mybatis.testtypehandlers2.V3Handler;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
@@ -56,6 +57,7 @@ public class MybatisModuleNoXMLIT {
                 .module(b -> MybatisModule.extend(b)
                         .addMapperPackage(T1Mapper.class.getPackage())
                         .addMapper(T2Mapper.class)
+                        .addTypeHandlerPackage(V3Handler.class)
                         .addTypeHandler(V1Handler.class))
                 .createRuntime();
 
@@ -74,8 +76,8 @@ public class MybatisModuleNoXMLIT {
     }
 
     private Table createT5() {
-        channel.execStatement().exec("CREATE TABLE \"t5\" (\"c1\" INT, \"c2\" INT)");
-        return channel.newTable("t5").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
+        channel.execStatement().exec("CREATE TABLE \"t5\" (\"c1\" INT, \"c2\" INT, \"c3\" INT, \"c4\" INT)");
+        return channel.newTable("t5").columnNames("c1", "c2", "c3", "c4").initColumnTypesFromDBMetadata().build();
     }
 
     @Test
@@ -123,8 +125,8 @@ public class MybatisModuleNoXMLIT {
     @Test
     public void testSqlSessionManager_TypeHandlers() {
 
-        createT5().insertColumns("c1", "c2")
-                .values(6, 15)
+        createT5().insertColumns("c1", "c2", "c3", "c4")
+                .values(6, 15, 24, 66)
                 .exec();
 
         try (SqlSession session = sessionManager.openSession()) {
@@ -135,6 +137,8 @@ public class MybatisModuleNoXMLIT {
             assertTrue(hit.isPresent());
             assertEquals(6, hit.get().getC1());
             assertEquals(15, hit.get().getC2().getV());
+            assertEquals(24, hit.get().getC3().getV());
+            assertEquals(66, hit.get().getC4().getV());
         }
     }
 }
