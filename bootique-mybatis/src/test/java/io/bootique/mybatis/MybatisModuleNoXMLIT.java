@@ -27,7 +27,7 @@ import io.bootique.mybatis.testmappers2.T2Mapper;
 import io.bootique.mybatis.testpojos.TO1;
 import io.bootique.mybatis.testpojos.TO2;
 import io.bootique.mybatis.testpojos.TO5;
-import io.bootique.mybatis.testtypehanlders.V1Handler;
+import io.bootique.mybatis.testtypehandlers.V1Handler;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;

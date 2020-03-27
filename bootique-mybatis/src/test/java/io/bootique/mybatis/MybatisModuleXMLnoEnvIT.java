@@ -22,7 +22,9 @@ import io.bootique.BQRuntime;
 import io.bootique.jdbc.test.DatabaseChannel;
 import io.bootique.jdbc.test.Table;
 import io.bootique.mybatis.testmappersxml1.T3Mapper;
+import io.bootique.mybatis.testmappersxml1.T6Mapper;
 import io.bootique.mybatis.testpojos.TO3;
+import io.bootique.mybatis.testpojos.TO6;
 import io.bootique.test.junit.BQTestFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
@@ -59,6 +61,11 @@ public class MybatisModuleXMLnoEnvIT {
         return channel.newTable("t3").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
     }
 
+    private Table createT6() {
+        channel.execStatement().exec("CREATE TABLE \"t6\" (\"c1\" INT, \"c2\" INT)");
+        return channel.newTable("t6").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
+    }
+
     @Test
     public void testSqlSessionManager() {
 
@@ -76,6 +83,23 @@ public class MybatisModuleXMLnoEnvIT {
             assertTrue(hit.isPresent());
             assertEquals(6, hit.get().getC1());
             assertEquals("x", hit.get().getC2());
+        }
+    }
+
+    @Test
+    public void testTypeHandler() {
+
+        createT6().insertColumns("c1", "c2")
+                .values(6, 24)
+                .exec();
+
+        try (SqlSession session = sessionManager.openSession()) {
+
+            T6Mapper mapper = session.getMapper(T6Mapper.class);
+            Optional<TO6> hit = mapper.find(6L);
+            assertTrue(hit.isPresent());
+            assertEquals(6, hit.get().getC1());
+            assertEquals(24, hit.get().getC2().getV());
         }
     }
 }

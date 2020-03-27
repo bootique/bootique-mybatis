@@ -39,6 +39,7 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     public MyBatisModuleExtender initAllExtensions() {
         contributeMappers();
         contributeMapperPackages();
+        contributeTypeHandlers();
         return this;
     }
 

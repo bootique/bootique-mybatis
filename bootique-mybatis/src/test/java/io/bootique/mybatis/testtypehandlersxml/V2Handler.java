@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.mybatis.testtypehanlders;
+package io.bootique.mybatis.testtypehandlersxml;
 
-import io.bootique.mybatis.testpojos.V1;
+import io.bootique.mybatis.testpojos.V2;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
@@ -27,28 +27,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class V1Handler extends BaseTypeHandler<V1> {
+public class V2Handler extends BaseTypeHandler<V2> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, V1 parameter, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int i, V2 parameter, JdbcType jdbcType) throws SQLException {
         ps.setInt(i, parameter.getV());
     }
 
     @Override
-    public V1 getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public V2 getNullableResult(ResultSet rs, String columnName) throws SQLException {
         int result = rs.getInt(columnName);
-        return result == 0 && rs.wasNull() ? null : new V1(result);
+        return result == 0 && rs.wasNull() ? null : new V2(result);
     }
 
     @Override
-    public V1 getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+    public V2 getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         int result = rs.getInt(columnIndex);
-        return result == 0 && rs.wasNull() ? null : new V1(result);
+        return result == 0 && rs.wasNull() ? null : new V2(result);
     }
 
     @Override
-    public V1 getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public V2 getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         int result = cs.getInt(columnIndex);
-        return result == 0 && cs.wasNull() ? null : new V1(result);
+        return result == 0 && cs.wasNull() ? null : new V2(result);
     }
 }

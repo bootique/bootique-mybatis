@@ -3,7 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <typeHandlers>
+        <typeHandler handler="io.bootique.mybatis.testtypehandlersxml.V2Handler" javaType="io.bootique.mybatis.testpojos.V2"/>
+    </typeHandlers>
     <mappers>
         <mapper resource="io/bootique/mybatis/t3-mapper.xml"/>
+        <mapper resource="io/bootique/mybatis/t6-mapper.xml"/>
     </mappers>
 </configuration>
