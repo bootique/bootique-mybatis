@@ -50,12 +50,11 @@ Add the dependency on `bootique-mybatis` to your build. Here is a Maven example:
     <artifactId>bootique-mybatis</artifactId>
 </dependency>
 ```
-After that you can either configure your mappers in the code and use Bootique-provided DataSource, or use MyBatis XML
-configuration. Below are a the examples of both.
+After that you can configure a number of things (mappers, type handlers) in the code and use Bootique-provided DataSource, and/or use MyBatis XML configuration. Below are a the examples of both.
 
-## Mappers Configured in the Code / DataSource Provided by Bootique
+## Configure Extensions in the Code / DataSource Provided by Bootique
 
-Configure MyBatis mappers:
+Configure MyBatis mappers and type handlers in the code:
 ```java
 public class MyModule implements Module {
 
@@ -66,7 +65,11 @@ public class MyModule implements Module {
 			// ... a whole package of Mappers
 			.addMapperPackage(MyMapper1.class.getPackage())
 			// ... a single mapper
-			.addMapper(MyMapper2.class))
+			.addMapper(MyMapper2.class)
+			// ... a whole package of TypeHandlers
+			.addTypeHandlerPackage(MyTH1.class.getPackage())
+			// ... a single mapper
+			.addTypeHandler(MyTH.class))
     }
 }
 ```
@@ -94,7 +97,7 @@ mybatis:
   datasource: myds
 ```
 
-## Everything is Configured in MyBatis XML
+## Configure Anything in MyBatis XML
 
 If you'd rather prefer to use MyBatis "canonical" approach with an XML config file, you can still do that (optionally
 combining it with Bootique-configured DataSource).
