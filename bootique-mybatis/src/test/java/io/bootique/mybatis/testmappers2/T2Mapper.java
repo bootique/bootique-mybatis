@@ -19,6 +19,8 @@
 package io.bootique.mybatis.testmappers2;
 
 import io.bootique.mybatis.testpojos.TO2;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -33,4 +35,7 @@ public interface T2Mapper {
             @Result(property = "c2", column = "c2")
     })
     Optional<TO2> find(Long c1);
+
+    @Insert("INSERT INTO \"t2\" (\"c1\", \"c2\") values (#{c1}, #{c2})")
+    void insert(@Param("c1") Long c1,  @Param("c2")  String c2);
 }
