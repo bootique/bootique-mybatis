@@ -25,27 +25,27 @@ import io.bootique.mybatis.testmappersxml1.T3Mapper;
 import io.bootique.mybatis.testmappersxml1.T6Mapper;
 import io.bootique.mybatis.testpojos.TO3;
 import io.bootique.mybatis.testpojos.TO6;
-import io.bootique.test.junit.BQTestFactory;
+import io.bootique.test.junit5.BQTestClassFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MybatisModuleXMLnoEnvIT {
 
-    @ClassRule
-    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
+    @RegisterExtension
+    public static BQTestClassFactory TEST_FACTORY = new BQTestClassFactory();
 
     private static BQRuntime runtime;
     private static DatabaseChannel channel;
     private static SqlSessionManager sessionManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupDB() {
         runtime = TEST_FACTORY
                 .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLnoEnvIT.yml")

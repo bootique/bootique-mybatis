@@ -21,24 +21,24 @@ package io.bootique.mybatis;
 import io.bootique.BQRuntime;
 import io.bootique.mybatis.testmappersxml1.T4Mapper;
 import io.bootique.mybatis.testpojos.TO4;
-import io.bootique.test.junit.BQTestFactory;
+import io.bootique.test.junit5.BQTestClassFactory;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MybatisModuleXMLwEnvIT {
 
-    @ClassRule
-    public static BQTestFactory TEST_FACTORY = new BQTestFactory();
+    @RegisterExtension
+    public static BQTestClassFactory TEST_FACTORY = new BQTestClassFactory();
     private static BQRuntime RUNTIME;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupDB() {
         RUNTIME = TEST_FACTORY
                 .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLwEnvIT.yml")
