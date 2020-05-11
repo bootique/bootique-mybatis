@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.bootique.mybatis.testmappers3.T7Mapper">
+    <select id="find" resultType="io.bootique.mybatis.testpojos.TO7">
+        SELECT "c1" FROM "t7" WHERE "c1" = #{c1}
+    </select>
+</mapper>
