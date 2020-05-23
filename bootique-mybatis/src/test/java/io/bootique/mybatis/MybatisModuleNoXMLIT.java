@@ -19,8 +19,8 @@
 package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
-import io.bootique.jdbc.test.DatabaseChannel;
-import io.bootique.jdbc.test.Table;
+import io.bootique.Bootique;
+import io.bootique.jdbc.test.DbTester;
 import io.bootique.mybatis.testmappers1.T1Mapper;
 import io.bootique.mybatis.testmappers1.T5Mapper;
 import io.bootique.mybatis.testmappers2.T2Mapper;
@@ -29,7 +29,8 @@ import io.bootique.mybatis.testpojos.TO2;
 import io.bootique.mybatis.testpojos.TO5;
 import io.bootique.mybatis.testtypehandlers1.V1Handler;
 import io.bootique.mybatis.testtypehandlers2.V3Handler;
-import io.bootique.test.junit5.BQTestClassFactory;
+import io.bootique.test.junit5.BQApp;
+import io.bootique.test.junit5.BQTest;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,54 +41,43 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@BQTest
 public class MybatisModuleNoXMLIT {
 
     @RegisterExtension
-    public static BQTestClassFactory TEST_FACTORY = new BQTestClassFactory();
+    static final DbTester db = DbTester.derbyDb();
 
-    private static BQRuntime runtime;
-    private static DatabaseChannel channel;
-    private static SqlSessionManager sessionManager;
+    @BQApp(skipRun = true)
+    private static BQRuntime app = Bootique
+            .app()
+            .autoLoadModules()
+            .module(db.setOrReplaceDataSource("db"))
+            .module(b -> MybatisModule.extend(b)
+                    .addMapperPackage(T1Mapper.class.getPackage())
+                    .addMapper(T2Mapper.class)
+                    .addTypeHandlerPackage(V3Handler.class)
+                    .addTypeHandler(V1Handler.class))
+            .createRuntime();
+
+    static SqlSessionManager getSessionManager() {
+        return app.getInstance(SqlSessionManager.class);
+    }
 
     @BeforeAll
-    public static void setupDB() {
-        runtime = TEST_FACTORY
-                .app("--config=classpath:io/bootique/mybatis/MybatisModuleNoXMLIT.yml")
-                .autoLoadModules()
-                .module(b -> MybatisModule.extend(b)
-                        .addMapperPackage(T1Mapper.class.getPackage())
-                        .addMapper(T2Mapper.class)
-                        .addTypeHandlerPackage(V3Handler.class)
-                        .addTypeHandler(V1Handler.class))
-                .createRuntime();
-
-        channel = DatabaseChannel.get(runtime);
-        sessionManager = runtime.getInstance(SqlSessionManager.class);
-    }
-
-    private Table createT1() {
-        channel.execStatement().exec("CREATE TABLE \"t1\" (\"c1\" INT, \"c2\" VARCHAR(10), \"c3\" VARCHAR(10))");
-        return channel.newTable("t1").columnNames("c1", "c2", "c3").initColumnTypesFromDBMetadata().build();
-    }
-
-    private Table createT2() {
-        channel.execStatement().exec("CREATE TABLE \"t2\" (\"c1\" INT, \"c2\" VARCHAR(10))");
-        return channel.newTable("t2").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
-    }
-
-    private Table createT5() {
-        channel.execStatement().exec("CREATE TABLE \"t5\" (\"c1\" INT, \"c2\" INT, \"c3\" INT, \"c4\" INT)");
-        return channel.newTable("t5").columnNames("c1", "c2", "c3", "c4").initColumnTypesFromDBMetadata().build();
+    static void createSchema() {
+        db.execStatement().exec("CREATE TABLE \"t1\" (\"c1\" INT, \"c2\" VARCHAR(10), \"c3\" VARCHAR(10))");
+        db.execStatement().exec("CREATE TABLE \"t2\" (\"c1\" INT, \"c2\" VARCHAR(10))");
+        db.execStatement().exec("CREATE TABLE \"t5\" (\"c1\" INT, \"c2\" INT, \"c3\" INT, \"c4\" INT)");
     }
 
     @Test
     public void testSqlSessionManager_PackageMappers() {
 
-        createT1().insertColumns("c1", "c2", "c3")
+        db.getTable("t1").insertColumns("c1", "c2", "c3")
                 .values(5, "a", "c")
                 .exec();
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
 
             T1Mapper t1Mapper = session.getMapper(T1Mapper.class);
             Optional<TO1> miss = t1Mapper.find(3L);
@@ -105,11 +95,11 @@ public class MybatisModuleNoXMLIT {
     @Test
     public void testSqlSessionManager_ClassMappers() {
 
-        createT2().insertColumns("c1", "c2")
+        db.getTable("t2").insertColumns("c1", "c2")
                 .values(6, "x")
                 .exec();
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
 
             T2Mapper t2Mapper = session.getMapper(T2Mapper.class);
             Optional<TO2> miss = t2Mapper.find(3L);
@@ -125,11 +115,11 @@ public class MybatisModuleNoXMLIT {
     @Test
     public void testSqlSessionManager_TypeHandlers() {
 
-        createT5().insertColumns("c1", "c2", "c3", "c4")
+        db.getTable("t5").insertColumns("c1", "c2", "c3", "c4")
                 .values(6, 15, 24, 66)
                 .exec();
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
 
             T5Mapper mapper = session.getMapper(T5Mapper.class);
 

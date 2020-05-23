@@ -19,38 +19,36 @@
 package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
+import io.bootique.Bootique;
 import io.bootique.mybatis.testmappersxml1.T4Mapper;
 import io.bootique.mybatis.testpojos.TO4;
-import io.bootique.test.junit5.BQTestClassFactory;
+import io.bootique.test.junit5.BQApp;
+import io.bootique.test.junit5.BQTest;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@BQTest
 public class MybatisModuleXMLwEnvIT {
 
-    @RegisterExtension
-    public static BQTestClassFactory TEST_FACTORY = new BQTestClassFactory();
-    private static BQRuntime RUNTIME;
+    @BQApp(skipRun = true)
+    private static BQRuntime app = Bootique
+            .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLwEnvIT.yml")
+            .autoLoadModules()
+            .createRuntime();
 
-    @BeforeAll
-    public static void setupDB() {
-        RUNTIME = TEST_FACTORY
-                .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLwEnvIT.yml")
-                .autoLoadModules()
-                .createRuntime();
+    static SqlSessionManager getSessionManager() {
+        return app.getInstance(SqlSessionManager.class);
     }
 
     @Test
     public void testSqlSessionManager() {
 
-        SqlSessionManager sessionManager = RUNTIME.getInstance(SqlSessionManager.class);
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
 
             T4Mapper mapper = session.getMapper(T4Mapper.class);
 

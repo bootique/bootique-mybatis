@@ -13,11 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-jdbc:
-  MybatisModuleXMLnoEnvIT:
-    url: jdbc:derby:target/derby/MybatisModuleXMLnoEnvIT;create=true
-    driverClassName: org.apache.derby.jdbc.EmbeddedDriver
-    initialSize: 1
-
 mybatis:
   config: "classpath:io/bootique/mybatis/mybatis-config-noenv.xml"

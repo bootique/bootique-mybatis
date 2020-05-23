@@ -19,100 +19,96 @@
 package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
-import io.bootique.jdbc.test.DatabaseChannel;
-import io.bootique.jdbc.test.Table;
-import io.bootique.jdbc.test.junit5.TestDataManager;
+import io.bootique.Bootique;
+import io.bootique.jdbc.test.DbTester;
 import io.bootique.mybatis.testmappers2.T2Mapper;
-import io.bootique.test.junit5.BQTestClassFactory;
+import io.bootique.test.junit5.BQApp;
+import io.bootique.test.junit5.BQTest;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@BQTest
 public class MybatisModuleTxIT {
 
     @RegisterExtension
-    public static BQTestClassFactory testFactory = new BQTestClassFactory();
+    static final DbTester db = DbTester
+            .derbyDb()
+            .deleteBeforeEachTest("t2");
 
-    private static SqlSessionManager sessionManager;
-    private static Table t2;
+    @BQApp(skipRun = true)
+    static final BQRuntime app = Bootique
+            .app()
+            .autoLoadModules()
+            .module(db.setOrReplaceDataSource("db"))
+            .module(b -> MybatisModule.extend(b).addMapper(T2Mapper.class))
+            .createRuntime();
 
-    @RegisterExtension
-    public TestDataManager dataManager = new TestDataManager(true, t2);
-
-    @BeforeAll
-    public static void setupDB() {
-        BQRuntime runtime = testFactory
-                .app("--config=classpath:io/bootique/mybatis/MybatisModuleTxIT.yml")
-                .autoLoadModules()
-                .module(b -> MybatisModule.extend(b).addMapper(T2Mapper.class))
-                .createRuntime();
-        DatabaseChannel channel = DatabaseChannel.get(runtime);
-        t2 = createT2(channel);
-        sessionManager = runtime.getInstance(SqlSessionManager.class);
+    static SqlSessionManager getSessionManager() {
+        return app.getInstance(SqlSessionManager.class);
     }
 
-    private static Table createT2(DatabaseChannel channel) {
-        channel.execStatement().exec("CREATE TABLE \"t2\" (\"c1\" INT, \"c2\" VARCHAR(10))");
-        return channel.newTable("t2").columnNames("c1", "c2").initColumnTypesFromDBMetadata().build();
+    @BeforeAll
+    static void createSchema() {
+        db.execStatement().exec("CREATE TABLE \"t2\" (\"c1\" INT, \"c2\" VARCHAR(10))");
     }
 
     @Test
     public void testCommit() {
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
             mapper.insert(1L, "one");
             session.commit();
         }
 
-        t2.matcher().eq("c1", 1L).assertOneMatch();
+        db.getTable("t2").matcher().eq("c1", 1L).assertOneMatch();
     }
-
 
     @Test
     public void testMapperOutsideSession_ImplicitAutocommit() {
 
-        T2Mapper mapper = sessionManager.getMapper(T2Mapper.class);
+        T2Mapper mapper = getSessionManager().getMapper(T2Mapper.class);
         mapper.insert(1L, "one");
-        t2.matcher().eq("c1", 1L).assertOneMatch();
+        db.getTable("t2").matcher().eq("c1", 1L).assertOneMatch();
     }
 
     @Test
     public void testRollback() {
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
             mapper.insert(1L, "one");
             session.rollback();
         }
 
-        t2.matcher().eq("c1", 1L).assertNoMatches();
+        db.getTable("t2").matcher().eq("c1", 1L).assertNoMatches();
     }
 
     @Test
     public void testNoCommit() {
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
             mapper.insert(1L, "one");
         }
 
-        t2.matcher().eq("c1", 1L).assertNoMatches();
+        db.getTable("t2").matcher().eq("c1", 1L).assertNoMatches();
     }
 
     @Test
     public void testCommitMultiple() {
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
             mapper.insert(1L, "one");
             mapper.insert(2L, "two");
             session.commit();
         }
 
-        t2.matcher().eq("c1", 1L).assertOneMatch();
-        t2.matcher().eq("c1", 2L).assertOneMatch();
+        db.getTable("t2").matcher().eq("c1", 1L).assertOneMatch();
+        db.getTable("t2").matcher().eq("c1", 2L).assertOneMatch();
     }
 }

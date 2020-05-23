@@ -20,15 +20,16 @@ package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
-import io.bootique.jdbc.test.DatabaseChannel;
-import io.bootique.jdbc.test.Table;
+import io.bootique.jdbc.test.DbTester;
 import io.bootique.mybatis.testmappers3.T7Mapper;
 import io.bootique.mybatis.testpojos.TO7;
 import io.bootique.test.junit5.BQApp;
 import io.bootique.test.junit5.BQTest;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Optional;
 
@@ -37,29 +38,34 @@ import static org.junit.jupiter.api.Assertions.*;
 @BQTest
 public class MybatisModuleXMLMapperNoXMLConfigIT {
 
+    @RegisterExtension
+    static final DbTester db = DbTester.derbyDb();
+
     @BQApp(skipRun = true)
-    static final BQRuntime runtime = Bootique
-            .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLMapperNoXMLConfigIT.yml")
+    static final BQRuntime app = Bootique
+            .app()
             .autoLoadModules()
+            .module(db.setOrReplaceDataSource("db"))
             .module(b -> MybatisModule.extend(b).addMapper(T7Mapper.class))
             .createRuntime();
 
-    static final DatabaseChannel channel = DatabaseChannel.get(runtime);
-    static final SqlSessionManager sessionManager = runtime.getInstance(SqlSessionManager.class);
+    @BeforeAll
+    static void createSchema() {
+        db.execStatement().exec("CREATE TABLE \"t7\" (\"c1\" INT)");
+    }
 
-    private Table createT7() {
-        channel.execStatement().exec("CREATE TABLE \"t7\" (\"c1\" INT)");
-        return channel.newTable("t7").columnNames("c1").initColumnTypesFromDBMetadata().build();
+    static SqlSessionManager getSessionManager() {
+        return app.getInstance(SqlSessionManager.class);
     }
 
     @Test
     public void testSqlSessionManager_XMLMapper() {
 
-        createT7().insertColumns("c1")
+        db.getTable("t7").insertColumns("c1")
                 .values(77)
                 .exec();
 
-        try (SqlSession session = sessionManager.openSession()) {
+        try (SqlSession session = getSessionManager().openSession()) {
 
             T7Mapper mapper = session.getMapper(T7Mapper.class);
             Optional<TO7> miss = mapper.find(3L);
