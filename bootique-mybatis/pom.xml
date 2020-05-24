@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>io.bootique.jdbc</groupId>
-            <artifactId>bootique-jdbc-test-junit5</artifactId>
+            <artifactId>bootique-jdbc-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

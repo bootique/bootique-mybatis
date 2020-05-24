@@ -20,7 +20,7 @@ package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
-import io.bootique.jdbc.test.DbTester;
+import io.bootique.jdbc.junit5.DbTester;
 import io.bootique.mybatis.testmappersxml1.T3Mapper;
 import io.bootique.mybatis.testmappersxml1.T6Mapper;
 import io.bootique.mybatis.testpojos.TO3;
