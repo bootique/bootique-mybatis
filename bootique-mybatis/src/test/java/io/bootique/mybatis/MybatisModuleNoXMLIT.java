@@ -51,7 +51,7 @@ public class MybatisModuleNoXMLIT {
     private static BQRuntime app = Bootique
             .app()
             .autoLoadModules()
-            .module(db.setOrReplaceDataSource("db"))
+            .module(db.moduleWithTestDataSource("db"))
             .module(b -> MybatisModule.extend(b)
                     .addMapperPackage(T1Mapper.class.getPackage())
                     .addMapper(T2Mapper.class)

@@ -45,7 +45,7 @@ public class MybatisModuleXMLMapperNoXMLConfigIT {
     static final BQRuntime app = Bootique
             .app()
             .autoLoadModules()
-            .module(db.setOrReplaceDataSource("db"))
+            .module(db.moduleWithTestDataSource("db"))
             .module(b -> MybatisModule.extend(b).addMapper(T7Mapper.class))
             .createRuntime();
 

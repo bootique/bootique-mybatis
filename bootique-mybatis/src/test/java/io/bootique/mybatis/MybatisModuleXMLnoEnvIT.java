@@ -47,7 +47,7 @@ public class MybatisModuleXMLnoEnvIT {
     static final BQRuntime app = Bootique
             .app("--config=classpath:io/bootique/mybatis/MybatisModuleXMLnoEnvIT.yml")
             .autoLoadModules()
-            .module(db.setOrReplaceDataSource("db"))
+            .module(db.moduleWithTestDataSource("db"))
             .createRuntime();
 
     static SqlSessionManager getSessionManager() {

@@ -42,7 +42,7 @@ public class MybatisModuleTxIT {
     static final BQRuntime app = Bootique
             .app()
             .autoLoadModules()
-            .module(db.setOrReplaceDataSource("db"))
+            .module(db.moduleWithTestDataSource("db"))
             .module(b -> MybatisModule.extend(b).addMapper(T2Mapper.class))
             .createRuntime();
 
