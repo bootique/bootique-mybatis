@@ -21,6 +21,9 @@ package io.bootique.mybatis;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.jdbc.junit5.DbTester;
+import io.bootique.junit5.BQApp;
+import io.bootique.junit5.BQTest;
+import io.bootique.junit5.BQTestTool;
 import io.bootique.mybatis.testmappers1.T1Mapper;
 import io.bootique.mybatis.testmappers1.T5Mapper;
 import io.bootique.mybatis.testmappers2.T2Mapper;
@@ -29,13 +32,10 @@ import io.bootique.mybatis.testpojos.TO2;
 import io.bootique.mybatis.testpojos.TO5;
 import io.bootique.mybatis.testtypehandlers1.V1Handler;
 import io.bootique.mybatis.testtypehandlers2.V3Handler;
-import io.bootique.junit5.BQApp;
-import io.bootique.junit5.BQTest;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @BQTest
 public class MybatisModuleNoXMLIT {
 
-    @RegisterExtension
+    @BQTestTool
     static final DbTester db = DbTester.derbyDb();
 
     @BQApp(skipRun = true)

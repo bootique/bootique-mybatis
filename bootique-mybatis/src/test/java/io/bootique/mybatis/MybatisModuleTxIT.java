@@ -21,19 +21,19 @@ package io.bootique.mybatis;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.jdbc.junit5.DbTester;
-import io.bootique.mybatis.testmappers2.T2Mapper;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
+import io.bootique.junit5.BQTestTool;
+import io.bootique.mybatis.testmappers2.T2Mapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 @BQTest
 public class MybatisModuleTxIT {
 
-    @RegisterExtension
+    @BQTestTool
     static final DbTester db = DbTester
             .derbyDb()
             .deleteBeforeEachTest("t2");
