@@ -20,7 +20,7 @@ package io.bootique.mybatis;
 
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
-import io.bootique.jdbc.junit5.DbTester;
+import io.bootique.jdbc.junit5.derby.DerbyTester;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestTool;
@@ -34,8 +34,8 @@ import org.junit.jupiter.api.Test;
 public class MybatisModuleTxIT {
 
     @BQTestTool
-    static final DbTester db = DbTester
-            .derbyDb()
+    static final DerbyTester db = DerbyTester
+            .db()
             .deleteBeforeEachTest("t2");
 
     @BQApp(skipRun = true)
