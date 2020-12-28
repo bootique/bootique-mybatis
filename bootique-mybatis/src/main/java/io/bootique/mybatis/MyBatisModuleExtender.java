@@ -47,17 +47,17 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     }
 
     public MyBatisModuleExtender addMapper(Class<?> mapperType) {
-        contributeMappers().add(mapperType);
+        contributeMappers().addInstance(mapperType);
         return this;
     }
 
     public MyBatisModuleExtender addMapperPackage(Package aPackage) {
-        contributeMapperPackages().add(aPackage);
+        contributeMapperPackages().addInstance(aPackage);
         return this;
     }
 
     public MyBatisModuleExtender addMapperPackage(Class<?> anyClassInPackage) {
-        contributeMapperPackages().add(anyClassInPackage.getPackage());
+        contributeMapperPackages().addInstance(anyClassInPackage.getPackage());
         return this;
     }
 
@@ -67,17 +67,17 @@ public class MyBatisModuleExtender extends ModuleExtender<MyBatisModuleExtender>
     }
 
     public <T extends TypeHandler> MyBatisModuleExtender addTypeHandler(T handler) {
-        contributeTypeHandlers().add(handler);
+        contributeTypeHandlers().addInstance(handler);
         return this;
     }
 
     public MyBatisModuleExtender addTypeHandlerPackage(Package aPackage) {
-        contributeTypeHandlerPackages().add(aPackage);
+        contributeTypeHandlerPackages().addInstance(aPackage);
         return this;
     }
 
     public MyBatisModuleExtender addTypeHandlerPackage(Class<?> anyClassInPackage) {
-        contributeTypeHandlerPackages().add(anyClassInPackage.getPackage());
+        contributeTypeHandlerPackages().addInstance(anyClassInPackage.getPackage());
         return this;
     }
 
