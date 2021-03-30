@@ -17,7 +17,7 @@
   under the License.
   -->
 
-[![Build Status](https://travis-ci.org/bootique/bootique-mybatis.svg)](https://travis-ci.org/bootique/bootique-mybatis)
+[![build test deploy](https://github.com/bootique/bootique-mybatis/actions/workflows/maven.yml/badge.svg)](https://github.com/bootique/bootique-mybatis/actions/workflows/maven.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.bootique.mybatis/bootique-mybatis.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.mybatis/bootique-mybatis/)
 
 # bootique-mybatis
