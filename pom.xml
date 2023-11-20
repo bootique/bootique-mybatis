@@ -28,7 +28,7 @@
 
     <groupId>io.bootique.mybatis</groupId>
     <artifactId>bootique-mybatis-parent</artifactId>
-    <version>3.0.M2-SNAPSHOT</version>
+    <version>3.0.M2</version>
 
     <packaging>pom</packaging>
 
@@ -49,7 +49,7 @@
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-mybatis</developerConnection>
         <url>https://github.com/bootique/bootique-mybatis</url>
-        <tag>HEAD</tag>
+        <tag>3.0.M2</tag>
     </scm>
 
     <dependencyManagement>
