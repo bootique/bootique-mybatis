@@ -46,7 +46,7 @@ public class MybatisModuleXMLwEnvIT {
     }
 
     @Test
-    public void testSqlSessionManager() {
+    public void sqlSessionManager() {
 
         try (SqlSession session = getSessionManager().openSession()) {
 

@@ -61,7 +61,7 @@ public class MybatisModuleXMLnoEnvIT {
     }
 
     @Test
-    public void testSqlSessionManager() {
+    public void sqlSessionManager() {
 
         db.getTable("t3").insertColumns("c1", "c2")
                 .values(6, "x")
@@ -81,7 +81,7 @@ public class MybatisModuleXMLnoEnvIT {
     }
 
     @Test
-    public void testTypeHandler() {
+    public void typeHandler() {
 
         db.getTable("t6").insertColumns("c1", "c2")
                 .values(6, 24)

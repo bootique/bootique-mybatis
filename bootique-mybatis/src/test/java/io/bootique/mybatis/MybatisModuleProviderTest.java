@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 public class MybatisModuleProviderTest {
 
     @Test
-    public void testAutoLoading() {
+    public void autoLoading() {
         BQModuleProviderChecker.testAutoLoadable(MybatisModuleProvider.class);
     }
 }

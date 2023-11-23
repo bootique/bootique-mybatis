@@ -59,7 +59,7 @@ public class MybatisModuleXMLMapperNoXMLConfigIT {
     }
 
     @Test
-    public void testSqlSessionManager_XMLMapper() {
+    public void sqlSessionManager_XMLMapper() {
 
         db.getTable("t7").insertColumns("c1")
                 .values(77)

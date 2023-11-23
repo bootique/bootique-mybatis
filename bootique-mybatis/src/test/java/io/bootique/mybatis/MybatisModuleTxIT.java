@@ -56,7 +56,7 @@ public class MybatisModuleTxIT {
     }
 
     @Test
-    public void testCommit() {
+    public void commit() {
 
         try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
@@ -68,7 +68,7 @@ public class MybatisModuleTxIT {
     }
 
     @Test
-    public void testMapperOutsideSession_ImplicitAutocommit() {
+    public void mapperOutsideSession_ImplicitAutocommit() {
 
         T2Mapper mapper = getSessionManager().getMapper(T2Mapper.class);
         mapper.insert(1L, "one");
@@ -76,7 +76,7 @@ public class MybatisModuleTxIT {
     }
 
     @Test
-    public void testRollback() {
+    public void rollback() {
 
         try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
@@ -88,7 +88,7 @@ public class MybatisModuleTxIT {
     }
 
     @Test
-    public void testNoCommit() {
+    public void noCommit() {
 
         try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);
@@ -99,7 +99,7 @@ public class MybatisModuleTxIT {
     }
 
     @Test
-    public void testCommitMultiple() {
+    public void commitMultiple() {
 
         try (SqlSession session = getSessionManager().openSession()) {
             T2Mapper mapper = session.getMapper(T2Mapper.class);

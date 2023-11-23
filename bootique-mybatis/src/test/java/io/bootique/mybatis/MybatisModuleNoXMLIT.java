@@ -71,7 +71,7 @@ public class MybatisModuleNoXMLIT {
     }
 
     @Test
-    public void testSqlSessionManager_PackageMappers() {
+    public void sqlSessionManager_PackageMappers() {
 
         db.getTable("t1").insertColumns("c1", "c2", "c3")
                 .values(5, "a", "c")
@@ -93,7 +93,7 @@ public class MybatisModuleNoXMLIT {
     }
 
     @Test
-    public void testSqlSessionManager_ClassMappers() {
+    public void sqlSessionManager_ClassMappers() {
 
         db.getTable("t2").insertColumns("c1", "c2")
                 .values(6, "x")
@@ -113,7 +113,7 @@ public class MybatisModuleNoXMLIT {
     }
 
     @Test
-    public void testSqlSessionManager_TypeHandlers() {
+    public void sqlSessionManager_TypeHandlers() {
 
         db.getTable("t5").insertColumns("c1", "c2", "c3", "c4")
                 .values(6, 15, 24, 66)
