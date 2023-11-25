@@ -21,10 +21,10 @@ package io.bootique.mybatis;
 import io.bootique.junit5.BQModuleProviderChecker;
 import org.junit.jupiter.api.Test;
 
-public class MybatisModuleProviderTest {
+public class MybatisModuleTest {
 
     @Test
     public void autoLoading() {
-        BQModuleProviderChecker.testAutoLoadable(MybatisModuleProvider.class);
+        BQModuleProviderChecker.testAutoLoadable(MybatisModule.class);
     }
 }

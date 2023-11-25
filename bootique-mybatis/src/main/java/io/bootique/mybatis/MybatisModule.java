@@ -18,8 +18,10 @@
  */
 package io.bootique.mybatis;
 
-import io.bootique.ConfigModule;
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.jdbc.DataSourceFactory;
@@ -33,7 +35,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Set;
 
-public class MybatisModule extends ConfigModule {
+public class MybatisModule implements BQModule, BQModuleProvider {
+
+    private static final String CONFIG_PREFIX = "mybatis";
 
     /**
      * Returns an instance of {@link MyBatisModuleExtender} used by downstream modules to load custom extensions of
@@ -45,6 +49,14 @@ public class MybatisModule extends ConfigModule {
      */
     public static MyBatisModuleExtender extend(Binder binder) {
         return new MyBatisModuleExtender(binder);
+    }
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates Mybatis persistence library")
+                .config(CONFIG_PREFIX, SqlSessionManagerFactory.class)
+                .build();
     }
 
     @Override
@@ -77,7 +89,7 @@ public class MybatisModule extends ConfigModule {
             @TypeHandlerPackageByMybatisModule Set<Package> typeHandlerPackages) {
 
         return configFactory
-                .config(SqlSessionManagerFactory.class, configPrefix)
+                .config(SqlSessionManagerFactory.class, CONFIG_PREFIX)
                 .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages, typeHandlers, typeHandlerPackages);
     }
 }

@@ -1,1 +1,1 @@
-io.bootique.mybatis.MybatisModuleProvider
+io.bootique.mybatis.MybatisModule
