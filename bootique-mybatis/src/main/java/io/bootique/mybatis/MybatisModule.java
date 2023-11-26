@@ -19,7 +19,7 @@
 package io.bootique.mybatis;
 
 import io.bootique.BQModuleProvider;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.BQModule;
 import io.bootique.di.Binder;
@@ -52,8 +52,8 @@ public class MybatisModule implements BQModule, BQModuleProvider {
     }
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(this)
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(this)
                 .description("Integrates Mybatis persistence library")
                 .config(CONFIG_PREFIX, SqlSessionManagerFactory.class)
                 .build();
