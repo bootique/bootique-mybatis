@@ -18,13 +18,13 @@
  */
 package io.bootique.mybatis;
 
-import io.bootique.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class MybatisModuleTest {
 
     @Test
-    public void autoLoading() {
-        BQModuleProviderChecker.testAutoLoadable(MybatisModule.class);
+    public void check() {
+        BQModuleTester.of(MybatisModule.class).testAutoLoadable().testConfig();
     }
 }
