@@ -34,6 +34,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -48,21 +49,39 @@ public class SqlSessionManagerFactory {
 
     private final Logger logger = LoggerFactory.getLogger(SqlSessionManagerFactory.class);
 
+    private final DataSourceFactory dsFactory;
+    private final Provider<TransactionFactory> transactionFactory;
+    private final @ByMybatisModule Set<Class<?>> mappers;
+    private final @ByMybatisModule Set<Package> mapperPackages;
+    private final Set<TypeHandler> typeHandlers;
+    private final @TypeHandlerPackageByMybatisModule Set<Package> typeHandlerPackages;
+
     private String environmentId;
     private String datasource;
     private ResourceFactory config;
 
-    public SqlSessionManager createSessionManager(
-            DataSourceFactory dataSourceFactory,
+    @Inject
+    public SqlSessionManagerFactory(
+            DataSourceFactory dsFactory,
             Provider<TransactionFactory> transactionFactory,
-            Set<Class<?>> mappers,
-            Set<Package> mapperPackages,
+            @ByMybatisModule Set<Class<?>> mappers,
+            @ByMybatisModule Set<Package> mapperPackages,
             Set<TypeHandler> typeHandlers,
-            Set<Package> typeHandlerPackages) {
+            @TypeHandlerPackageByMybatisModule Set<Package> typeHandlerPackages) {
+
+        this.dsFactory = dsFactory;
+        this.transactionFactory = transactionFactory;
+        this.mappers = mappers;
+        this.mapperPackages = mapperPackages;
+        this.typeHandlers = typeHandlers;
+        this.typeHandlerPackages = typeHandlerPackages;
+    }
+
+    public SqlSessionManager createSessionManager() {
 
         Configuration configuration = config != null
-                ? createConfigurationFromXML(dataSourceFactory, transactionFactory)
-                : createConfigurationFromScratch(dataSourceFactory, transactionFactory.get());
+                ? createConfigurationFromXML()
+                : createConfigurationFromScratch();
 
         // must install handlers before loading mappers... mappers need handlers
         mergeDITypeHandlers(configuration, typeHandlers, typeHandlerPackages);
@@ -72,9 +91,7 @@ public class SqlSessionManagerFactory {
         return SqlSessionManager.newInstance(sessionFactoryDelegate);
     }
 
-    protected Configuration createConfigurationFromXML(
-            DataSourceFactory dataSourceFactory,
-            Provider<TransactionFactory> transactionFactory) {
+    protected Configuration createConfigurationFromXML() {
 
         String environmentId = getEnvironmentId();
         Configuration configuration = loadConfigurationFromXML(config, environmentId);
@@ -85,30 +102,26 @@ public class SqlSessionManagerFactory {
             logger.debug("MyBatis XML configuration does not specify environment for '{}'. Bootstrapping environment from Bootique...", environmentId);
 
             // deferring TransactionFactory creation until we know for sure that we need it...
-            Environment environment = createEnvironment(dataSourceFactory, transactionFactory.get());
+            Environment environment = createEnvironment();
             configuration.setEnvironment(environment);
         }
 
         return configuration;
     }
 
-    protected Configuration createConfigurationFromScratch(
-            DataSourceFactory dataSourceFactory,
-            TransactionFactory transactionFactory) {
+    protected Configuration createConfigurationFromScratch() {
 
-        Environment environment = createEnvironment(dataSourceFactory, transactionFactory);
+        Environment environment = createEnvironment();
         return new Configuration(environment);
     }
 
-    protected Environment createEnvironment(
-            DataSourceFactory dataSourceFactory,
-            TransactionFactory transactionFactory) {
+    protected Environment createEnvironment() {
 
-        String datasourceName = dataSourceName(dataSourceFactory);
+        String datasourceName = dataSourceName();
         logger.debug("Using Bootique DataSource named '{}' for MyBatis", datasourceName);
 
-        DataSource ds = dataSourceFactory.forName(datasourceName);
-        return new Environment(getEnvironmentId(), transactionFactory, ds);
+        DataSource ds = dsFactory.forName(datasourceName);
+        return new Environment(getEnvironmentId(), transactionFactory.get(), ds);
     }
 
     protected Configuration loadConfigurationFromXML(ResourceFactory configResource, String environmentId) {
@@ -145,13 +158,13 @@ public class SqlSessionManagerFactory {
         mapperPackages.forEach(mp -> configuration.addMappers(mp.getName()));
     }
 
-    protected String dataSourceName(DataSourceFactory dataSourceFactory) {
+    protected String dataSourceName() {
 
         if (datasource != null) {
             return datasource;
         }
 
-        Collection<String> names = dataSourceFactory.allNames();
+        Collection<String> names = dsFactory.allNames();
         if (names.size() == 1) {
             return names.iterator().next();
         }

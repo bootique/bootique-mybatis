@@ -23,16 +23,12 @@ import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
 import io.bootique.di.Provides;
-import io.bootique.jdbc.DataSourceFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.apache.ibatis.type.TypeHandler;
 
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.Set;
 
 public class MybatisModule implements BQModule {
 
@@ -78,17 +74,10 @@ public class MybatisModule implements BQModule {
     // SqlSessionManager is a newer more feature-rich version of SqlSessionFactory (which actually wraps a factory)
     @Provides
     @Singleton
-    public SqlSessionManager provideSessionManager(
-            ConfigurationFactory configFactory,
-            DataSourceFactory dsFactory,
-            Provider<TransactionFactory> transactionFactory,
-            @ByMybatisModule Set<Class<?>> mappers,
-            @ByMybatisModule Set<Package> mapperPackages,
-            Set<TypeHandler> typeHandlers,
-            @TypeHandlerPackageByMybatisModule Set<Package> typeHandlerPackages) {
+    public SqlSessionManager provideSessionManager(ConfigurationFactory configFactory) {
 
         return configFactory
                 .config(SqlSessionManagerFactory.class, CONFIG_PREFIX)
-                .createSessionManager(dsFactory, transactionFactory, mappers, mapperPackages, typeHandlers, typeHandlerPackages);
+                .createSessionManager();
     }
 }
