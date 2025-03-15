@@ -28,7 +28,7 @@ import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 public class MybatisModule implements BQModule {
 
