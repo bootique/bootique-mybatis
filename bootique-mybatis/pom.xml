@@ -26,7 +26,12 @@
         <artifactId>bootique-mybatis-parent</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
+
     <artifactId>bootique-mybatis</artifactId>
+    <name>bootique-mybatis: MyBatis integration module</name>
+    <description>
+        MyBatis integration module
+    </description>
 
     <dependencies>
         <dependency>
