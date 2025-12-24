@@ -1,3 +1,7 @@
+## 4.0-M2
+
+* #4 Upgrade to MyBatis 3.5.19
+
 ## 2.0.B1
 
 * #3 Bump mybatis from 3.5.4 to 3.5.6
