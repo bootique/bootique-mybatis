@@ -38,7 +38,7 @@ Add the dependency on `bootique-mybatis` to your build. Here is a Maven example:
         <dependency>
             <groupId>io.bootique.bom</groupId>
             <artifactId>bootique-bom</artifactId>
-            <version>X.X</version>
+            <version>4.0-M4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
